@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de URL para ViajareSIM</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const planData = [
+            [1093,20,30,"Plan Low Cost VIP","t","Arabia Saudita","sa"],
+            [767,1,7,"Plan Explorador","f","Oman","om"],
+            [547,"unlimited",1,"Plan ilimitado","f","Japon","jp"],
+            [174,10,30,"Plan Low Cost","t","Camerun","cm"]
+            // Añade aquí más planes según necesites
+        ];
 
+        function URLGenerator() {
+            const [selectedPlans, setSelectedPlans] = React.useState([]);
+            const [url, setUrl] = React.useState('');
+            const [filter, setFilter] = React.useState('');
+
+            const filteredPlans = React.useMemo(() => {
+                return planData.filter(plan => 
+                    plan[5].toLowerCase().includes(filter.toLowerCase()) ||
+                    plan[3].toLowerCase().includes(filter.toLowerCase())
+                );
+            }, [filter]);
+
+            const handlePlanSelect = (e) => {
+                const selectedPlanId = parseInt(e.target.value);
+                const selectedPlan = planData.find(plan => plan[0] === selectedPlanId);
+                if (selectedPlan && !selectedPlans.some(p => p[0] === selectedPlan[0])) {
+                    setSelectedPlans([...selectedPlans, selectedPlan]);
+                }
+            };
+
+            const handleRemovePlan = (planId) => {
+                setSelectedPlans(selectedPlans.filter(plan => plan[0] !== planId));
+            };
+
+            const generateURL = () => {
+                const planParams = selectedPlans.map(plan => {
+                    const dataParam = plan[1] === 'unlimited' ? 'datos-ilimitados' : `${plan[1]}-gb`;
+                    return `plan=${plan[5].toLowerCase().replace(/ /g, '-')},${plan[2]}-dias,${dataParam},1`;
+                }).join('&');
+
+                setUrl(`https://viajaresim.com/pago?${planParams}`);
+            };
+
+            return (
+                <div style={{padding: '1rem', fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: '0 auto'}}>
+                    <h1 style={{fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 'bold', marginBottom: '1rem', textAlign: 'center'}}>
+                        Generador de URL para ViajareSIM
+                    </h1>
+                    <input
+                        type="text"
+                        pla
